@@ -3,6 +3,7 @@ import Link from "next/link";
 import CartIcon from "./CartIcon";
 import Menu from "@/components/Menu";
 import Image from "next/image";
+import UserLinks from "./UserLinks";
 
 const Navbar = () => {
   // TEMPORARY
@@ -35,11 +36,7 @@ const Navbar = () => {
           />
           <span>123 465 988</span>
         </div>
-        {!user ? (
-          <Link href="/login">Login</Link>
-        ) : (
-          <Link href="/orders">Orders</Link>
-        )}
+        <UserLinks />
         <CartIcon />
       </div>
     </div>
