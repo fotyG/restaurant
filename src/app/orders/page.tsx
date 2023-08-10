@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { FormEvent } from "react";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { OrderType } from "@/types/types";
 
@@ -20,6 +22,33 @@ const OrdersPage = () => {
     queryFn: () =>
       fetch("http://localhost:3000/api/orders").then((res) => res.json()),
   });
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) => {
+      return fetch(`http://localhost:3000/api/orders/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(status),
+      });
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+
+  const handleUpdate = (e: FormEvent<HTMLFormElement>, id: string) => {
+    e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    const input = form.elements[0] as HTMLInputElement;
+    const status = input.value;
+    mutation.mutate({ id, status });
+    toast.success("Order status updated!");
+  };
 
   if (isLoading || status === "loading") return "Loading...";
 
@@ -39,7 +68,9 @@ const OrdersPage = () => {
           {data.map((item: OrderType) => (
             <tr
               key={item.id}
-              className="text-sm md:text-base bg-red-50"
+              className={`text-sm md:text-base ${
+                item.status !== "delivered" && "bg-red-50"
+              }`}
             >
               <td className="hidden md:block py-6 px-1">{item.id}</td>
               <td className="py-6 px-1">
@@ -51,7 +82,10 @@ const OrdersPage = () => {
               </td>
               {session?.user.isAdmin ? (
                 <td>
-                  <form>
+                  <form
+                    className="flex items-center justify-center gap-4"
+                    onSubmit={(e) => handleUpdate(e, item.id)}
+                  >
                     <input
                       placeholder={item.status}
                       className="p-2 ring-1 ring-red-100 rounded-md"

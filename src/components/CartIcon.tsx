@@ -1,7 +1,17 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import { useEffect } from "react";
+
+import { useCartStore } from "@/utils/store";
 
 const CartIcon = () => {
+  useEffect(() => {
+    useCartStore.persist.rehydrate();
+  }, []);
+
+  const { totalItems } = useCartStore();
   return (
     <Link
       href="/cart"
@@ -14,7 +24,7 @@ const CartIcon = () => {
           fill
         />
       </div>
-      <span>Cart (3)</span>
+      <span>Cart ({totalItems})</span>
     </Link>
   );
 };

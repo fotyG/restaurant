@@ -1,9 +1,11 @@
 import { Inter } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 
 import "./globals.css";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import "react-toastify/dist/ReactToastify.css";
 import Notification from "@/components/Notification";
 import AuthProvider from "@/components/AuthProvider";
 import QueryProvider from "@/components/QueryProvider";
@@ -29,6 +31,11 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Footer />
+            <ToastContainer
+              theme="dark"
+              autoClose={3000}
+              position="bottom-right"
+            />
           </QueryProvider>
         </AuthProvider>
       </body>
